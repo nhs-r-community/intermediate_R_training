@@ -1,11 +1,11 @@
-# GP GPAD Access Dashboard
-## NHS England SW Intelligence and Insights
+# Intermediate R Training
+## Developed by NHSE in colloboration with NHSR community
 
 ### About the Project
 
 [![status: experimental](https://github.com/GIScience/badges/raw/master/status/experimental.svg)](https://github.com/GIScience/badges#experimental)
 
-This repository holds code for the GP Access Dashboard
+This repository holds code training course.
 
 _**Note:** Only public or fake data are shared in this repository._
 
@@ -18,27 +18,12 @@ _**Note:** Only public or fake data are shared in this repository._
 [R Studio](RStudio Team (2020). RStudio: Integrated Development for R. RStudio, PBC, Boston, MA URL http://www.rstudio.com/.)  
 [R Statistical Software](  R Core Team (2018). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL https://www.R-project.org/.)
 
-library(flexdashboard)
+
 library(tidyverse)
-library(readr)
-library(easycsv)
 library(janitor)
-library(lubridate)
-library(timeDate)
-library(bizdays)
-library(readxl)
-library(rjson)
-library(TTR)
-library(astsa)
-library(forecast)
-library(rlang)
-library(gridExtra)
-library(reactable)
-library(english)
-library(gridExtra)
-library(here)
 library(zoo)
 library(NHSRplotthedots)
+library(NHSRdatasets)
 
 ### Getting Started
 
@@ -49,25 +34,18 @@ To get a local copy up and running follow these simple steps.
 To clone the repo:
 
 ### Usage
-Code takes UKHF data from UDAL and creates GPAD dashboard.
 
-Currently data is hard coded to caluclate rates for South West Region and ICBs.  This could be adjusted to work within other regions.
-
-To run the report you need access to UDAL and create a personal credentials file with server name and user details.
-
-This file will be sourced from the gp.data_input_sql.R file which will create a CSV.
-
-This CSV is then read in by the GP Flex v3d file which needs to be knitted from within posit.
+Script is all self contained and pulls data from the library NHSRdatasets
 
 #### Outputs
-Results in markdown flex dashboard
+No outputs are produced beyond consol results
 
 #### Datasets
-Uses publically available GPAD data.  This is pulled from UDAL within NHSE.
-
+Psuedo data from the library NHSRdatasets
 
 ### Roadmap
-Hope to add more analysis around timeliness metrics as these are developed nationally.
+Additional sections around Tables and Charts to be considered.
+Not sure if script along is best method or if more traditional slide method could be used.  Would consider converting to quarto slides.
 
 ### Contributing
 
