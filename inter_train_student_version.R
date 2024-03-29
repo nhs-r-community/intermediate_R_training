@@ -229,7 +229,7 @@ data_select <- data |>
   select (date_period = period,
           organisation = org_code)
 
-# can also do a ! for negative select
+# can also do a ! or - for negative select
 data_select <- data |>
   select (!c(org_code,
              period))
@@ -239,6 +239,7 @@ data_select <- data |>
   select (!org_code,
           !period)
 # THIS DOES NOT WORK
+
 data_select <- data |>
   select (-org_code,
           -period)
@@ -265,7 +266,8 @@ data_select <- data |>
 
 # <<< Over to you >>>>
 
-# select the data so that it is order of admissions, any column that is a factor and then anything else
+# select the data so that it is order of admissions, 
+#  any column that is a factor and then anything else
 
 
 
@@ -333,7 +335,7 @@ df_two <- data |>
   tail()
 
 df_new <- bind_rows(df_one,
-                df_two)
+                    df_two)
 
 
 # <<< Over to you >>>>
@@ -372,12 +374,12 @@ df_two <- data |>
           admissions) 
 
 df_new_union <-union(df_one, 
-               df_two)
+                     df_two)
 
 
 # Finding identical columns in both tables 
 df_new_intersect <- intersect(df_one, 
-                    df_two)
+                              df_two)
 
 # Finding rows that don’t exist in another table 
 df_new_diff <- setdiff(df_one, 
@@ -453,7 +455,7 @@ data_filter <- data |>
 # filters data to type 1 OR 'attendances over 10,000
 data_filter <- data |>
   filter(type == '1' | 
-         attendances > 10000)
+           attendances > 10000)
 
 # <<< Over to you >>>>
 
@@ -626,8 +628,8 @@ data_tot_perc <- data |>
 
 data_tot_perc <- data |>
   mutate (across(where(is.numeric),
-           ~(. / sum(.)) * 100,
-          .names = "perc_{.col}"),
+                 ~(. / sum(.)) * 100,
+                 .names = "perc_{.col}"),
           .by = c(org_code, period))
 
 # across also uses tidy select functions
@@ -935,7 +937,7 @@ data_row <- data |>
   arrange(org_code,
           type,
           period) |>
-
+  
   mutate(row_num = row_number(),
          .by = org_code, type)
 
@@ -949,22 +951,22 @@ data_row <- data |>
 #  *bonus points* to return the last 3 rows for only type 1 for each organisation
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# HINT: this isn't SQL, you can reuse functions later in a pipe
-
+# answer
+data_row <- data |>
+  filter(org_code %in% c('RQM',
+                         'RJ1', 
+                         'RDD'),
+         !between (period,                      # note the ! in front for the between to convert it into a not between
+                   as.Date('2017-04-01') , 
+                   as.Date('2018-03-30')),
+         type == 1
+  ) |>  
+  arrange(org_code,
+          type,
+          period) |>
+  mutate(row_num = row_number(),
+         .by = org_code, type) |>
+  filter (row_num<4)
 
 #####################
 # grouping by dates #
@@ -1002,13 +1004,8 @@ data_finance <- data |>
 
 
 
+# HINT: this isn't SQL, you can reuse functions later in a pipe
 
-
-
-
-
-
-###################
 
 
 ######################
@@ -1034,7 +1031,7 @@ data_org_code_numbers <- data |>
 
 data_filt <- data |>
   filter (str_detect (org_code,'R') |      # note the use of | to denote 'or'
-          str_detect (org_code,'P'))
+            str_detect (org_code,'P'))
 
 # <<< Over to you >>>>
 
@@ -1051,7 +1048,8 @@ data_filt <- data |>
 
 
 
-#################################
+
+################################
 
 # sometimes we want to shorten strings 
 # we can do this by words or characters
@@ -1106,8 +1104,7 @@ short_hospital_name
 
 
 
-
-#####
+###
 
 #####################
 # intro to  factors #
@@ -1205,6 +1202,19 @@ data_spc |>
 
 ###################
 
+# answer
+data_spc <- data |>
+  filter(org_code == 'RVR',
+         type == '1')
+
+data_spc |>
+  ptd_spc(value_field = attendances,
+          date_field = period,
+          target = 17500,
+          improvement_direction = 'decrease')
+
+#################
+
 # we now want to create a for each attendance type
 data_spc <- data |>
   filter(org_code == 'RVR')
@@ -1260,7 +1270,6 @@ plot_spc |>
 
 
 #####################################
-
 
 ################################
 # Basic functional programming #
@@ -1345,7 +1354,6 @@ is_odd_or_even(4256)
 
 ####  HINT paste0 is your friend to 'return' to
 
-is_odd_or_even (4,5)
 
 # we can apply our made up new functions to a dataframe
 
@@ -1522,3 +1530,13 @@ vector
 # pretty tables
 # pretty graphs
 # markdown/quarto
+
+
+
+
+
+
+
+
+
+
