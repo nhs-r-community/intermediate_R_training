@@ -407,7 +407,8 @@ data_old <- data |>
 
 # nu skool is
 data_old <- data |>
-  summarise (count = n(), .by = type) 
+  summarise (count = n(), 
+             .by = type) 
 
 # old skool would be
 data_old <- data |>
@@ -417,7 +418,8 @@ data_old <- data |>
 
 # nu skool is
 data_old <- data |>
-  mutate (double_admissions = admissions * 2, .by = type)
+  mutate (double_admissions = admissions * 2, 
+          .by = type)
 
 # nu skool, dropping groups is default, no need to ungroup()
 
@@ -453,7 +455,8 @@ data_filter <- data |>
 
 # filters data to latest date period per org code
 data_filter <- data |>
-  filter(period == max(period), .by = org_code)
+  filter(period == max(period), 
+         .by = org_code)
 
 # filters data to type 1 AND 'attendances over 10,000
 data_filter <- data |>
@@ -463,7 +466,7 @@ data_filter <- data |>
 # filters data to type 1 OR 'attendances over 10,000
 data_filter <- data |>
   filter(type == '1' | 
-           attendances > 10000)
+         attendances > 10000)
 
 # <<< Over to you >>>>
 
@@ -522,10 +525,23 @@ data <-data |>
                                          attendances < 15000 ~ '10,000 to 14,999',
                                          attendances < 20000 ~ '15,000 to 19,999',
                                          attendances < 25000 ~ '20,000 to 24,999',
+                                         .default =  'Over 25,0000'))
+
+# the .default gives the default or 'else' statement
+# the '~' is called a tilde and can be found as shift # next to the return key
+
+# there is also an old skool way of doing this 
+data <-data |>
+  mutate(attendance_grouping = case_when(attendances < 5000 ~ 'Less than 5,000',
+                                         attendances < 10000 ~ '5,000 to 9,999',
+                                         attendances < 15000 ~ '10,000 to 14,999',
+                                         attendances < 20000 ~ '15,000 to 19,999',
+                                         attendances < 25000 ~ '20,000 to 24,999',
                                          TRUE ~ 'Over 25,0000'))
 
-# note the 'true' is the else statement 
-# the '~' is called a tilde and can be found as shift # next to the return key
+# note the 'true' is the else statement and you use a tilder rather than equals
+# both work the same, the .default is the more modern method
+
 
 # however lets make a deliberate issue
 
@@ -549,7 +565,7 @@ data <-data |>
                                          attendances < 20000 ~ '15,000 to 19,999',
                                          attendances < 25000 ~ '20,000 to 24,999',
                                          attendances > 25000 ~ 'Over 25,0000',
-                                         TRUE ~ 'ERROR - does not compute'))
+                                         .default = 'ERROR - does not compute'))
 
 # <<< Over to you >>>>
 
@@ -575,6 +591,9 @@ data <-data |>
 
 # base R if statement - allows us to do what I call a one-sided if statement
 # really useful if you want to trigger a conditional process
+
+# curly brackets denote a 'scope' - a scope being a piece of code that may
+# not necessarily be evaluated and does not always affect the global environment
 
 a <- 10
 
@@ -860,7 +879,7 @@ data_roll <- data |>
 # see if you can the window to 3 months
 # then add an additional new column with a median over 3 months
 # with the median, see if you can calculate it on the middle time period
-#  and replace any blanks with 9999
+# and replace any blanks with 9999
 
 
 
@@ -945,7 +964,6 @@ data_row <- data |>
   arrange(org_code,
           type,
           period) |>
-  
   mutate(row_num = row_number(),
          .by = org_code, type)
 
@@ -959,22 +977,20 @@ data_row <- data |>
 #  *bonus points* to return the last 3 rows for only type 1 for each organisation
 
 
-# answer
-data_row <- data |>
-  filter(org_code %in% c('RQM',
-                         'RJ1', 
-                         'RDD'),
-         !between (period,                      # note the ! in front for the between to convert it into a not between
-                   as.Date('2017-04-01') , 
-                   as.Date('2018-03-30')),
-         type == 1
-  ) |>  
-  arrange(org_code,
-          type,
-          period) |>
-  mutate(row_num = row_number(),
-         .by = org_code, type) |>
-  filter (row_num<4)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #####################
 # grouping by dates #
@@ -1005,6 +1021,11 @@ data_finance <- data |>
 # and returns the maximum number of type 1 attendances 
 # across those sites by financial year
 # (yes that is a ridiculous question)
+
+
+
+
+
 
 
 
@@ -1208,22 +1229,11 @@ data_spc |>
 
 
 
-###################
 
-# answer
-data_spc <- data |>
-  filter(org_code == 'RVR',
-         type == '1')
-
-data_spc |>
-  ptd_spc(value_field = attendances,
-          date_field = period,
-          target = 17500,
-          improvement_direction = 'decrease')
 
 #################
 
-# we now want to create a for each attendance type
+# we now want to create a chart for each attendance type
 data_spc <- data |>
   filter(org_code == 'RVR')
 
@@ -1257,7 +1267,7 @@ plot_spc |>
 #   Change the point size to look nicer
 #    Change the x axis label to date rather than period
 #      Make any other changes you feel would be useful to describe chart
-# Bonus points - think about using paste to make nice dynamic titles
+#  Bonus points - think about using paste to make nice dynamic titles
 
 
 
@@ -1300,19 +1310,10 @@ z <- 15
 # we want to triple each of our variables and then 
 # we could do x*3, y*3, z*3 
 
-# then we want to check if our result is odd or even
-# (we can do this with the %% operator - this is a modulous operator that returns the reminder of a division)
-# ie 4/2 = 2 with no remainder   4%%2 = 0
-# ie 5/2 = 2 with 1 remainder    5%%2 = 1
-# therefore if a number %%2 == 0 then it is an even number else it is odd
 
 # so in long hand we could do
 x_mult <- x * 3
 
-x_mod <- x_mult %% 2
-
-# then
-if_else(x_mod == 0, 'Even', 'Odd')
 
 # but we would have to repeat all of that again if we wanted to check y & z and
 # change all the varibles
@@ -1324,29 +1325,121 @@ if_else(x_mod == 0, 'Even', 'Odd')
 # NOTE - a function can only return one result, but later we will be clever in how 
 #        this 'one result' is built
 
-is_odd_or_even <- function (input) {
-  mult <- input * 3
-  mod <- mult %% 2
-  return (if_else(mod == 0, 'Even', 'Odd'))
+times_three <- function (input) {
+  return (input * 3)
 }
 
 # we can now test it with our variables
-is_odd_or_even(x)
+times_three(x)
 
-is_odd_or_even(y)
+times_three(y)
 
 # or put in a new number completely
-is_odd_or_even(4256)
+times_three(7)
 
 # NOTE the variables mult and mod within our function only exist within the function
 
 # you can add more than one varible into a function seperated by commas
 
+x_times_y <- function (x, y) {
+  result <- x * y
+  return (print(paste0('The answer is ', result)))
+}
+
+x_times_y (5,4)
+
+# a functfunctionion will only return one thing.  
+# You do not have to specify what it returns with a return function
+# R will by default return the last thing in a function
+
+x_times_y_no_return <- function (x, y) {
+  result <- x * y
+  print(paste0('The answer is ', result))
+}
+
+x_times_y_no_return (5,4)
+
+# going back to our curly brackets and 'scope' for a function
+# what happens in a functions scope is not in the global environment
+# for instance the varible 'result' has not been created
+# it only exists within the scope
+# a function's scope can not affect outide of the function
+
+test <- 'monkey'
+
+x_times_y_scope <- function (x, y) {
+  result <- x * y
+  test <- 'moo'
+  print(paste0('The answer is ', result))
+}
+
+# before we run this what will happen to the variable 'test'?
+x_times_y_scope (5,4)
+
+
+# you can also add multiple steps in a function
+x_times_y_plus_ten_date <- function (x, y) {
+  result <- x * y
+  day_of_month <- day(Sys.Date())
+  if_else(day_of_month > 15, 
+          result + 10, 
+          result)
+}
+
+# without running it please type int the chat the result of the function
+# x_times_y_plus_ten_date (3,10)
+
+# functions get pretty convoluted pretty quickly and can be hard to read
+# which is why it is good practice to write doc strings for functions 
+
+
+
+
+
+x_times_y_plus_ten_date <- function (x, y) {
+# This function multiplies two numbers (x and y) and adds 10 to the result 
+# if the current day of the month is greater than 15. Otherwise, it simply 
+# returns the product of x and y.
+#
+# @param x [numeric] The first number to be multiplied.
+# @param y [numeric] The second number to be multiplied.
+#
+# @return The product of x and y, with 10 added if the current day is past 
+# the 15th.
+#
+# @examples
+# Example 1: Today is the 10th of the month
+# x <- 5
+# y <- 2
+# result <- x_times_y_plus_ten_date(x, y)
+# print(result) # Output: 10
+#
+# Example 2: Today is the 20th of the month
+# x <- 3
+# y <- 4
+# result <- x_times_y_plus_ten_date(x, y)
+# print(result) # Output: 22
+
+  result <- x * y
+  day_of_month <- day(Sys.Date())
+  if_else(day_of_month > 15, 
+          result + 10, 
+          result)
+}
+
+# now this is an extreme example with multiple examples, at the most basic
+# you should include a description and a varible description
+# future you or anoyone else reading the code will be very thankful!
+
+# this function will fall over if you feed it the wring data type, more
+# advanced functions can handle error checking and testing, but thats for another day
+
 # <<< Over to you >>>>
 
-#  tweak the above function so that instead of times by 3 
-#  you specify the number it multiples by
-#  for bonus points return a string that says "<input> times by <whatever> is <answer> and is an <odd/even> number"
+#  tweak the above function so that instead of times the first two inputs and 
+#  adds 10 to result on a day in the month you specify (another variable)
+
+# for bonus points assign your result to a variable
 
 
 
@@ -1358,9 +1451,6 @@ is_odd_or_even(4256)
 
 
 
-
-
-####  HINT paste0 is your friend to 'return' to
 
 
 # we can apply our made up new functions to a dataframe
@@ -1371,9 +1461,10 @@ data_fun <- data |>
          type == '1') |>
   select (-breaches)
 
-# perhaps the most ludracous columns name yet!
+# perhaps the most ludicrous column name yet!
 data_fun <- data_fun |>
-  mutate(attend_times_admit_ood_or_even = is_odd_or_even (attendances, admissions))
+  rowwise() |>
+  mutate(attend_times_admit_maybe_plus_ten = x_times_y_plus_ten_date (attendances, admissions))
 
 
 # this is a bit of a silly example but shows what potentially can be done.
@@ -1447,6 +1538,55 @@ plot_site('RJ1')
 # what if there is a new site or a site is removed.  I then have to keep a curated
 # site list.  Sounds like hard work.  Yerk!
 
+
+# the same function but with added doc string
+
+plot_site <- function (site, df=data) {
+#
+# This function generates a PTD (Period-to-Date)ggplot for a specific site 
+# based on attendance data. It utilizes pre-defined functions like 
+# `ptd_spc` and `ptd_create_ggplot` (assumed to be available).
+#
+# @param site The organizational code of the site you want to plot data for.
+# @param df (default = data) A data frame containing the attendance data.
+#        This data frame should have columns named `org_code`, `attendances`, 
+#        `period`, and `type`.
+#
+# @details This function filters the data frame based on the provided `site` 
+#          code. It then uses `ptd_spc` to calculate PTD values and improvement 
+#          direction (assumed to be decrease based on the code) for each 
+#          attendance type (`type`). Finally, it utilizes `ptd_create_ggplot` 
+#          to create the PTD ggplot with specific formatting options 
+#          (formatting options are assumed to be set in `ptd_create_ggplot`).
+#
+# @return A ggplot object representing the PTD for the specified site.
+#
+# @examples
+# 
+# Assuming you have data loaded in a data frame named 'data' containing 
+# columns 'org_code', 'attendances', 'period', and 'type', you can use the 
+# following code to generate a PTD plot for site 'ABC':
+#
+# plot_site("ABC", data)
+# This will display the ggplot object
+
+data_spc <- df |>     
+  filter(org_code == site)      
+
+# turn our ptd_spc into an object
+plot_spc <- data_spc |>
+  ptd_spc(value_field = attendances,
+          date_field = period,
+          improvement_direction = 'decrease',
+          facet_field = type)
+
+return (plot_spc |> 
+          ptd_create_ggplot(fixed_y_axis_multiple = FALSE,
+                            x_axis_date_format = "%b %y",
+                            x_axis_breaks = "2 months"))
+}
+
+
 ####################
 # simple for loops #
 ####################
@@ -1470,6 +1610,12 @@ for (i in seq(1,10)) {                 # traditionally variables in a loop start
   result <- paste0(i,' plus 5 equals ', i_plus_five)
   print(result)
 }
+
+# again with the curly brackets and scope
+# a for loop does have global scope, if you look i_plus_five
+# exists in the global enviornemt, only with its last value
+# it was over written each time time in the loop
+
 
 # we can mess about with seq to come up with all sorts of number patterns
 
