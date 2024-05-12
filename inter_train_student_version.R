@@ -37,12 +37,20 @@
 # load in initial libraries
 # will come back to the code around this
 
-if(!require(NHSRdatasets)){
-  install.packages("NHSRdatasets",dependencies =TRUE )
-  library(NHSRdatasets)}
-if(!require(tidyverse)){
-  install.packages("tidyverse", dependencies =TRUE)
-  library(tidyverse)}
+# Specify required packages
+my_packages <- c("tidyverse",
+                 "NHSRdatasets",
+                 "pacman") 
+
+# Extract not installed packages
+not_installed <- my_packages[!(my_packages %in% installed.packages()[ , "Package"])]  
+
+# Install not installed packages
+if(length(not_installed)) install.packages(not_installed)   
+
+# Load all packages
+pacman::p_load(char = my_packages) 
+
 
 ################################
 # Some useful base R functions #
@@ -1530,7 +1538,6 @@ vector
 # pretty tables
 # pretty graphs
 # markdown/quarto
-
 
 
 
