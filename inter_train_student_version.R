@@ -1428,8 +1428,8 @@ x_times_y_plus_ten_date <- function (x, y) {
 }
 
 # now this is an extreme example with multiple examples, at the most basic
-# you should include a description and a varible description
-# future you or anoyone else reading the code will be very thankful!
+# you should include a description and a variable description
+# future you or anyone else reading the code will be very thankful!
 
 # this function will fall over if you feed it the wring data type, more
 # advanced functions can handle error checking and testing, but thats for another day
@@ -1455,7 +1455,6 @@ x_times_y_plus_ten_date <- function (x, y) {
 
 # we can apply our made up new functions to a dataframe
 
-# answer
 data_fun <- data |>
   filter(org_code %in% c('RQM', 'RJ1', 'RDD'),
          type == '1') |>
@@ -1469,6 +1468,26 @@ data_fun <- data_fun |>
 
 # this is a bit of a silly example but shows what potentially can be done.
 # can be great for calculating rates per 10,000 
+
+# lets do another quick example function
+
+# <<< Over to you >>>>
+
+# create a function to calculate the mean of 3 numbers
+# without using the 'mean' function
+# for extra credit
+# create a function that calculates the mean over any set of numbers
+
+
+
+
+
+
+
+
+
+
+
 
 # is not just data functions, we can set up a plot to be a function
 # say we had our lovely SPC chart set up the way we want it and we just want 
