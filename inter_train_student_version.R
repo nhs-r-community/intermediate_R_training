@@ -66,7 +66,7 @@ colnames(data)
 data$type
 
 # get list of unique data items in a variable
-unique(data$type)
+unique(data$org_code)
 
 # notice the bit of base R
 # base R is a useful for certain things and is its a good idea
@@ -86,7 +86,7 @@ data$type[4:10]
 #  this is very different to how python does indexing
 
 # get number of distinct entries
-n_distinct(data$type)
+n_distinct(data$org_code)
 
 # get the range of a variable (useful for dates)
 range(data$period)
@@ -122,9 +122,6 @@ top_frac(data,
 # <<< Over to you >>>>
 
 # see if you can find the lowest 5 attendances
-
-
-
 
 
 
@@ -187,6 +184,7 @@ data <- clean_names(data)
 
 
 
+
 ###### HINT - check the order or your rename!
 
 #######################
@@ -197,6 +195,9 @@ data <- clean_names(data)
 # add quick totals 
 # check it out, tidyverse and janitor are probably the two librarys
 # I call at the start of any analysis
+
+# best to run this to ensure we are back to clean data
+data <- ae_attendances
 
 ####################
 # select statement #
@@ -285,8 +286,6 @@ data_select <- data |>
 
 
 
-
-
 ##############
 
 ####################################################
@@ -345,12 +344,15 @@ df_two <- data |>
 df_new <- bind_rows(df_one,
                     df_two)
 
+# or in a pipe
+
+df_new <- df_new |>
+  bind_rows(df_two)
 
 # <<< Over to you >>>>
 
 #create a dataframe of the top 5 admissions only
 #and the bottom 5 attendances only and join the two columns together
-
 
 
 
@@ -384,7 +386,6 @@ df_two <- data |>
 df_new_union <-union(df_one, 
                      df_two)
 
-
 # Finding identical columns in both tables 
 df_new_intersect <- intersect(df_one, 
                               df_two)
@@ -406,7 +407,7 @@ data_old <- data |>
   ungroup ()
 
 # nu skool is
-data_old <- data |>
+data_nu <- data |>
   summarise (count = n(), 
              .by = type) 
 
@@ -417,7 +418,7 @@ data_old <- data |>
   ungroup ()
 
 # nu skool is
-data_old <- data |>
+data_nu <- data |>
   mutate (double_admissions = admissions * 2, 
           .by = type)
 
@@ -445,6 +446,12 @@ data_count <- data |>
 data_count <- data |>
   add_count(org_code)
 
+# is the same as
+data_count <- data |>
+  mutate (count = n(),
+          .by = type)
+
+
 ###################
 # fancy filtering #
 ###################
@@ -453,7 +460,8 @@ data_count <- data |>
 data_filter <- data |>
   filter(str_detect(org_code, "R"))
 
-# filters data to latest date period per org code
+# filters data to latest date period per org code 
+# (such an awesome feature to put a group by in a filter!)
 data_filter <- data |>
   filter(period == max(period), 
          .by = org_code)
@@ -466,7 +474,7 @@ data_filter <- data |>
 # filters data to type 1 OR 'attendances over 10,000
 data_filter <- data |>
   filter(type == '1' | 
-         attendances > 10000)
+           attendances > 10000)
 
 # <<< Over to you >>>>
 
@@ -487,7 +495,7 @@ data_filter <- data |>
 
 
 # HINT you can count on the fact we have already covered how to do this
-# and maybe look at what else the function can do
+# and maybe look at what else the function can do (?count)
 
 ###############################
 
@@ -508,7 +516,7 @@ data <- data |>
 data <- data |>
   mutate(above_20000 = if_else (attendances >= 20000, 
                                 100,
-                                'one hundred'))
+                                9999))
 
 # will throw a wobble
 
@@ -539,7 +547,7 @@ data <-data |>
                                          attendances < 25000 ~ '20,000 to 24,999',
                                          TRUE ~ 'Over 25,0000'))
 
-# note the 'true' is the else statement and you use a tilder rather than equals
+# note the 'true' is the else statement and you use a tilde rather than equals
 # both work the same, the .default is the more modern method
 
 
@@ -554,11 +562,11 @@ data$attendances[1] <- 25000
 # Lets also add some null data 
 data$attendances[1] <- NA
 
-# again the case statement fails
+# again the case statement 'works' but is incorrect
 
 # personally I find it best to use the true statement as an error catch 
 
-data <-data |>
+data <- data |>
   mutate(attendance_grouping = case_when(attendances < 5000 ~ 'Less than 5,000',
                                          attendances < 10000 ~ '5,000 to 9,999',
                                          attendances < 15000 ~ '10,000 to 14,999',
@@ -567,15 +575,15 @@ data <-data |>
                                          attendances > 25000 ~ 'Over 25,0000',
                                          .default = 'ERROR - does not compute'))
 
+# we can fix this by adding a >= and changing our grouping
+# description to '25,000 and over'
+
 # <<< Over to you >>>>
 
 # add a column that if type 1 halves the attendances
 #                   if type 2 triples the attendances
 #                   if type other quads the attendances
 #                   if error a suitable error
-
-
-
 
 
 
@@ -595,26 +603,30 @@ data <-data |>
 # curly brackets denote a 'scope' - a scope being a piece of code that may
 # not necessarily be evaluated and does not always affect the global environment
 
-a <- 10
+a <- 5
 
 if (a == 5)  {
   a <- 10
   print ('a is now 10')
   b <- a
   print('b has been created as a variable and is now a')
-}
+} 
+
 
 # this is really powerful as works by if condition in brackets is met
-# to ALL of what is in brackets
+# to do ALL of what is in the brackets
+# the 'scope' of the if statement is global
+
+a<- 5
 
 if (a == 5)  {
   a <- 10
   print ('a is now 10')
-  b <- a
-  print('b has been created as a variable and is now a')
+  c <- a
+  print('c has been created as a variable and is now a')
 } else {
   print('a is ', a)
-  print('b does not exist')
+  print('c does not exist')
 }
 
 
@@ -639,6 +651,8 @@ data_tot_perc <- data |>
 # that creates a pretty long decimal as a percentage
 # can you round it to 1 decimal place?
 # may need a little google fu
+
+
 
 
 
@@ -679,7 +693,11 @@ data <-data |>
   rowwise() |>
   mutate(max_col = max(attendances,
                        admissions, 
-                       new_attendance))
+                       breaches,
+                       na.rm=TRUE)) |>
+  ungroup()
+
+# note that rowwise is a grouping function and needs to be ungrouped
 
 ##########################
 # pivot wider and longer #
@@ -706,6 +724,7 @@ data <-data |>
 
 # lets start with filtering our data and selecting only a few columns
 
+
 data_wide <- data |>
   filter(org_code == 'RQM',
          type == '1',
@@ -724,10 +743,6 @@ data_wide <- data_wide |>
 # <<< Over to you >>>>
 
 #  do the same but for breaches
-
-
-
-
 
 
 
@@ -839,7 +854,7 @@ data_wide <- data_wide |>
 
 # and make it long
 data_long <- data_wide |>
-  pivot_longer(cols = starts_with('20'),
+  pivot_longer(cols = where(is.numeric),
                names_to = 'period',
                values_to = 'attendances')
 
@@ -857,6 +872,8 @@ data_long <- data_wide |>
 library(zoo)
 
 # zoo has a lovely function for rolling windows
+
+data <- ae_attendances
 
 data_roll <- data |>
   filter(org_code %in% c('RQM',
@@ -920,7 +937,7 @@ data_row <- data |>
           type,
           period) |>
   mutate(row_number = row_number(),
-         .by=org_code)
+         .by=c(org_code, type))
 
 # row number per date (dense rank)
 data_row <- data |>
@@ -935,7 +952,8 @@ data_row <- data |>
 # rank its inverse which would work just fine
 # however you can't inverse a date. Therefore have reordered them and then 
 # converted the rank into an absolute value
-# (horrible but it works)
+# (horrible but it works) 
+# (this was an answer to a student question and so left it here)
 data_row <- data |>
   filter(org_code %in% c('RQM',
                          'RJ1', 
@@ -950,14 +968,13 @@ data_row <- data |>
   arrange(period) |>
   mutate(row_number = min_rank(period))
 
-
 # now lets remove 2018 and check the row numbers still work on the new dataset
 
 data_row <- data |>
   filter(org_code %in% c('RQM',
                          'RJ1', 
                          'RDD'),
-         !between (period,                      # note the ! in front for the between to convert it into a not between
+         !between (period,  # note the ! in front for the between to convert it into a not between
                    as.Date('2018-01-01') , 
                    as.Date('2018-12-31'))
   ) |>  
@@ -972,14 +989,8 @@ data_row <- data |>
 
 # <<< Over to you >>>>
 
-#  adjust the code above to remove the financial year 2017 and
+#  adjust the code above to remove the year 2017 and
 #  return only the first 3 rows for only type 1 for each organisation
-#  *bonus points* to return the last 3 rows for only type 1 for each organisation
-
-
-
-
-
 
 
 
@@ -1031,9 +1042,6 @@ data_finance <- data |>
 
 
 
-
-
-# HINT: this isn't SQL, you can reuse functions later in a pipe
 
 
 
@@ -1132,8 +1140,7 @@ short_hospital_name
 
 
 
-
-###
+##########################################################
 
 #####################
 # intro to  factors #
@@ -1142,6 +1149,17 @@ short_hospital_name
 # a quick note on factors
 # factors are a datatype that converts a character into a ordinal datatype
 # think low medium and high
+
+data <- ae_attendances
+
+data <-data |>
+  mutate(attendance_grouping = case_when(attendances < 5000 ~ 'Less than 5,000',
+                                         attendances < 10000 ~ '5,000 to 9,999',
+                                         attendances < 15000 ~ '10,000 to 14,999',
+                                         attendances < 20000 ~ '15,000 to 19,999',
+                                         attendances < 25000 ~ '20,000 to 24,999',
+                                         attendances >= 25000 ~ '25,000 and over',
+                                         .default = 'ERROR - does not compute'))
 
 # lets have a look at our attendance groupings
 data_fact <- data |>
@@ -1165,7 +1183,7 @@ data_fact <- data_fact |>
       "10,000 to 14,999",
       "15,000 to 19,999",
       "20,000 to 24,999",
-      "Over 25,0000")
+      "25,000 and over")
   )
   )
 
@@ -1182,10 +1200,14 @@ data_fact |> ggplot(aes(x=attendance_grouping)) +
 # there are further funky things with factors, but will have to skim over.
 # just to say you can re order your factors for build your factors on other variables.
 
+# WARNING - if you set your data as factors, R will not like you adding data 
+# into that column if is not one of the factors you have created.
+# There are ways of doing this but dont't have time now to go into detail
+# It is also possible to make factors more dynamically - again no time
+
 #########################
 # intro to dynamic text #
 #########################
-
 
 # A quick note on combining text and variables - useful for writing commentary or dynamic labels
 
@@ -1198,6 +1220,16 @@ text <- paste0('The maximum number of attendances was ', max(data$attendances))
 # you can make longer strings and switch between text and non text with commas
 
 text <- paste0('The maximum number of attendances was ', max(data$attendances), ' and the lowest was ', min(data$attendances))
+
+# the glue library has functions that are easier to use than paste
+library (glue)
+
+max_attend<- max(data$attendances)
+min_attend <- min(data$attendances)
+
+glue('The maximum number of attendances was {max_attend} and the lowest was {min_attend}')
+# this does the same with with considerably fewer brackets and commas
+
 
 ############################################
 # SPC - statistical process control graphs #
@@ -1218,8 +1250,6 @@ data_spc |>
 
 #  add in a target of 17500
 #  we actually want to show improvement as a reduction 
-
-
 
 
 
@@ -1267,9 +1297,6 @@ plot_spc |>
 #   Change the point size to look nicer
 #    Change the x axis label to date rather than period
 #      Make any other changes you feel would be useful to describe chart
-#  Bonus points - think about using paste to make nice dynamic titles
-
-
 
 
 
@@ -1338,17 +1365,19 @@ times_three(y)
 times_three(7)
 
 # NOTE the variables mult and mod within our function only exist within the function
-
+# this is the scope of the function
+# a function can only return one object
 # you can add more than one varible into a function seperated by commas
 
 x_times_y <- function (x, y) {
   result <- x * y
-  return (print(paste0('The answer is ', result)))
+  b <- 150
+  return (print(paste0('The answer is ', result, 'and b is ', b)))
 }
 
-x_times_y (5,4)
+var <- x_times_y (x,y)
 
-# a functfunctionion will only return one thing.  
+# a function will only return one thing.  
 # You do not have to specify what it returns with a return function
 # R will by default return the last thing in a function
 
@@ -1370,7 +1399,7 @@ test <- 'monkey'
 x_times_y_scope <- function (x, y) {
   result <- x * y
   test <- 'moo'
-  print(paste0('The answer is ', result))
+  print(paste0('The answer is ', test))
 }
 
 # before we run this what will happen to the variable 'test'?
@@ -1386,40 +1415,36 @@ x_times_y_plus_ten_date <- function (x, y) {
           result)
 }
 
-# without running it please type int the chat the result of the function
-# x_times_y_plus_ten_date (3,10)
+# without running it please type into the chat the result of the function
+x_times_y_plus_ten_date (3,10)
 
 # functions get pretty convoluted pretty quickly and can be hard to read
 # which is why it is good practice to write doc strings for functions 
 
-
-
-
-
 x_times_y_plus_ten_date <- function (x, y) {
-# This function multiplies two numbers (x and y) and adds 10 to the result 
-# if the current day of the month is greater than 15. Otherwise, it simply 
-# returns the product of x and y.
-#
-# @param x [numeric] The first number to be multiplied.
-# @param y [numeric] The second number to be multiplied.
-#
-# @return The product of x and y, with 10 added if the current day is past 
-# the 15th.
-#
-# @examples
-# Example 1: Today is the 10th of the month
-# x <- 5
-# y <- 2
-# result <- x_times_y_plus_ten_date(x, y)
-# print(result) # Output: 10
-#
-# Example 2: Today is the 20th of the month
-# x <- 3
-# y <- 4
-# result <- x_times_y_plus_ten_date(x, y)
-# print(result) # Output: 22
-
+  # This function multiplies two numbers (x and y) and adds 10 to the result 
+  # if the current day of the month is greater than 15. Otherwise, it simply 
+  # returns the product of x and y.
+  #
+  # @param x [numeric] The first number to be multiplied.
+  # @param y [numeric] The second number to be multiplied.
+  #
+  # @return The product of x and y, with 10 added if the current day is past 
+  # the 15th.
+  #
+  # @examples
+  # Example 1: Today is the 10th of the month
+  # x <- 5
+  # y <- 2
+  # result <- x_times_y_plus_ten_date(x, y)
+  # print(result) # Output: 10
+  #
+  # Example 2: Today is the 20th of the month
+  # x <- 3
+  # y <- 4
+  # result <- x_times_y_plus_ten_date(x, y)
+  # print(result) # Output: 22
+  
   result <- x * y
   day_of_month <- day(Sys.Date())
   if_else(day_of_month > 15, 
@@ -1440,7 +1465,6 @@ x_times_y_plus_ten_date <- function (x, y) {
 #  adds 10 to result on a day in the month you specify (another variable)
 
 # for bonus points assign your result to a variable
-
 
 
 
@@ -1477,6 +1501,9 @@ data_fun <- data_fun |>
 # without using the 'mean' function
 # for extra credit
 # create a function that calculates the mean over any set of numbers
+
+
+
 
 
 
@@ -1527,7 +1554,7 @@ plot_site('RDD')
 # or to point it at another dataset if we want to without having to copy the function
 
 
-plot_site <- function (site, df=data) {     # this is where we set a default
+plot_site <- function (site='RJ1', df=data) {     # this is where we set a default
   
   # we now want to create a for each attendance type
   data_spc <- df |>                        # note this is where pulling in our data
@@ -1561,48 +1588,48 @@ plot_site('RJ1')
 # the same function but with added doc string
 
 plot_site <- function (site, df=data) {
-#
-# This function generates a PTD (Period-to-Date)ggplot for a specific site 
-# based on attendance data. It utilizes pre-defined functions like 
-# `ptd_spc` and `ptd_create_ggplot` (assumed to be available).
-#
-# @param site The organizational code of the site you want to plot data for.
-# @param df (default = data) A data frame containing the attendance data.
-#        This data frame should have columns named `org_code`, `attendances`, 
-#        `period`, and `type`.
-#
-# @details This function filters the data frame based on the provided `site` 
-#          code. It then uses `ptd_spc` to calculate PTD values and improvement 
-#          direction (assumed to be decrease based on the code) for each 
-#          attendance type (`type`). Finally, it utilizes `ptd_create_ggplot` 
-#          to create the PTD ggplot with specific formatting options 
-#          (formatting options are assumed to be set in `ptd_create_ggplot`).
-#
-# @return A ggplot object representing the PTD for the specified site.
-#
-# @examples
-# 
-# Assuming you have data loaded in a data frame named 'data' containing 
-# columns 'org_code', 'attendances', 'period', and 'type', you can use the 
-# following code to generate a PTD plot for site 'ABC':
-#
-# plot_site("ABC", data)
-# This will display the ggplot object
-
-data_spc <- df |>     
-  filter(org_code == site)      
-
-# turn our ptd_spc into an object
-plot_spc <- data_spc |>
-  ptd_spc(value_field = attendances,
-          date_field = period,
-          improvement_direction = 'decrease',
-          facet_field = type)
-
-return (plot_spc |> 
-          ptd_create_ggplot(fixed_y_axis_multiple = FALSE,
-                            x_axis_date_format = "%b %y",
-                            x_axis_breaks = "2 months"))
+  #
+  # This function generates a PTD (Plot the dots)ggplot for a specific site 
+  # based on attendance data. It utilizes pre-defined functions like 
+  # `ptd_spc` and `ptd_create_ggplot` (assumed to be available).
+  #
+  # @param site The organizational code of the site you want to plot data for.
+  # @param df (default = data) A data frame containing the attendance data.
+  #        This data frame should have columns named `org_code`, `attendances`, 
+  #        `period`, and `type`.
+  #
+  # @details This function filters the data frame based on the provided `site` 
+  #          code. It then uses `ptd_spc` to calculate PTD values and improvement 
+  #          direction (assumed to be decrease based on the code) for each 
+  #          attendance type (`type`). Finally, it utilizes `ptd_create_ggplot` 
+  #          to create the PTD ggplot with specific formatting options 
+  #          (formatting options are assumed to be set in `ptd_create_ggplot`).
+  #
+  # @return A ggplot object representing the PTD for the specified site.
+  #
+  # @examples
+  # 
+  # Assuming you have data loaded in a data frame named 'data' containing 
+  # columns 'org_code', 'attendances', 'period', and 'type', you can use the 
+  # following code to generate a PTD plot for site 'ABC':
+  #
+  # plot_site("ABC", data)
+  # This will display the ggplot object
+  
+  data_spc <- df |>     
+    filter(org_code == site)      
+  
+  # turn our ptd_spc into an object
+  plot_spc <- data_spc |>
+    ptd_spc(value_field = attendances,
+            date_field = period,
+            improvement_direction = 'decrease',
+            facet_field = type)
+  
+  return (plot_spc |> 
+            ptd_create_ggplot(fixed_y_axis_multiple = FALSE,
+                              x_axis_date_format = "%b %y",
+                              x_axis_breaks = "2 months"))
 }
 
 
@@ -1665,7 +1692,7 @@ for (i in vector) {
 
 plot_list <- list ()
 
-# this is the vecor we will feed to our loop
+# this is the vector we will feed to our loop
 vector <- c('RQM', 'RJ1', 'RDD')
 
 for (i in vector) {
