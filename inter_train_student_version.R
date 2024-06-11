@@ -43,7 +43,8 @@ my_packages <- c("tidyverse",
                  "pacman") 
 
 # Extract not installed packages
-not_installed <- my_packages[!(my_packages %in% installed.packages()[ , "Package"])]  
+not_installed <- my_packages[!(my_packages %in% 
+                                 installed.packages()[ , "Package"])]  
 
 # Install not installed packages
 if(length(not_installed)) install.packages(not_installed)   
@@ -69,19 +70,20 @@ data$type
 unique(data$org_code)
 
 # notice the bit of base R
-# base R is a useful for certain things and is its a good idea
+# base R is useful for certain things and it is a good idea
 # to understand some of the basics at how some of the things work
 # The $ sign allows us to call a column of a data frame as a vector.
 data$type
 
-# it is also possible to to select a specific entry within that vector with square brackets
-# this to call the 4th entry we can
+# it is also possible to to select a specific entry within that vector with 
+# square brackets
+# to call the 4th entry we can
 data$type[4]
 
 # we could also call the 4th to 10th entries
 data$type[4:10]
 
-# note to python users, we start counting at  1 and not zero
+# note to python users, we start counting at 1 and not zero
 # we also include the 10th entry 
 #  this is very different to how python does indexing
 
@@ -129,7 +131,6 @@ top_frac(data,
 
 #########################
 
-
 # see summary statistics of a dataframe
 # summary is a super function that also can give great summaries of other
 # objects - such as linear models 
@@ -157,7 +158,7 @@ table (data$type,
 data <- data |>
   rename(`Organisation Code` = org_code)
 
-#lets also rename some more variables to something horrible
+# lets also rename some more variables to something horrible
 data <- data |>
   rename(Breaches = breaches,
          PERIOD = period,
@@ -183,11 +184,7 @@ data <- clean_names(data)
 
 
 
-
-
-###### HINT - check the order or your rename!
-
-#######################
+#########################
 
 # janitor has some other really helpful functions to 
 # convert excel dates to dates (if they do that weird numeric thing)
@@ -222,7 +219,8 @@ data_select <- data |>
 view(data_select)
 
 # I have included a view statement here to look at our data, there are various 
-# other ways to achieve the same without having do so so much or indeed any typing
+# other ways to achieve the same without having do so so much or indeed any 
+# typing
 
 # you can simply call the name of the dataframe object
 data_select
@@ -282,11 +280,7 @@ data_select <- data |>
 
 
 
-
-
-
-
-##############
+#########################
 
 ####################################################
 # alternative joins - row and column concatenation #
@@ -315,7 +309,8 @@ df_new <- cbind(df_one,
                 df_two)
 
 # note duplicated column is duplicated - which can cause issues - best to remove
-# or rename - also maintains order - need to be mindful you have rows that line up
+# or rename - also maintains order - need to be mindful you have rows that line 
+# up
 
 # we can also bind data frames by rows, this is similar to concatenation 
 # in sql, need matching columns
@@ -325,11 +320,12 @@ df_one <- data |>
 df_two <- data |>
   tail()
 
-df_new <- bind_rows(df_one,
-                    df_two)
+df_new <- rbind(df_one,
+                df_two)
 
 # if we dont have matching columns can use bind_rows
-# which matches columns where they match and puts in na for where data does not match
+# which matches columns where they match and puts in na for where data does not 
+# match
 
 df_one <- data |>
   select (period,
@@ -351,23 +347,14 @@ df_new <- df_new |>
 
 # <<< Over to you >>>>
 
-#create a dataframe of the top 5 admissions only
-#and the bottom 5 attendances only and join the two columns together
+# create a dataframe of the top 5 admissions only
+# and the bottom 5 attendances only and join the two columns together
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-########################################
+#########################
 
 # if you want to join columns of different sizes you are 
 # probably better off using the join family of functions
@@ -383,8 +370,8 @@ df_two <- data |>
   select (org_code,
           admissions) 
 
-df_new_union <-union(df_one, 
-                     df_two)
+df_new_union <- union(df_one, 
+                      df_two)
 
 # Finding identical columns in both tables 
 df_new_intersect <- intersect(df_one, 
@@ -436,7 +423,7 @@ data_nu <- data |>
 data_count <- data |>
   count(type)
 
-#this could be the same as
+# this could be the same as
 data_count <- data |>
   summarise (count = n(),
              .by = type)
@@ -486,18 +473,7 @@ data_filter <- data |>
 
 
 
-
-
-
-
-
-
-
-
-# HINT you can count on the fact we have already covered how to do this
-# and maybe look at what else the function can do (?count)
-
-###############################
+#########################
 
 ################
 # conditionals #
@@ -516,36 +492,45 @@ data <- data |>
 data <- data |>
   mutate(above_20000 = if_else (attendances >= 20000, 
                                 100,
-                                9999))
+                                "9999"))
 
 # will throw a wobble
 
 # if_else is great for a single conditional - you can nest if_else statements
-# but that gets really messy quickly, especially with the amount of brackets at the end
+# but that gets really messy quickly, especially with the amount of brackets at
+# the end
 
 # multi part conditional - or case statement
 
 # lets create a grouping column for our attendances in 5000s
 
-data <-data |>
-  mutate(attendance_grouping = case_when(attendances < 5000 ~ 'Less than 5,000',
-                                         attendances < 10000 ~ '5,000 to 9,999',
-                                         attendances < 15000 ~ '10,000 to 14,999',
-                                         attendances < 20000 ~ '15,000 to 19,999',
-                                         attendances < 25000 ~ '20,000 to 24,999',
-                                         .default =  'Over 25,0000'))
+data <- data |>
+  mutate(
+    attendance_grouping = case_when(
+      attendances < 5000 ~ 'Less than 5,000',
+      attendances < 10000 ~ '5,000 to 9,999',
+      attendances < 15000 ~ '10,000 to 14,999',
+      attendances < 20000 ~ '15,000 to 19,999',
+      attendances < 25000 ~ '20,000 to 24,999',
+      .default =  'Over 25,0000'
+    )
+  )
 
 # the .default gives the default or 'else' statement
 # the '~' is called a tilde and can be found as shift # next to the return key
 
 # there is also an old skool way of doing this 
-data <-data |>
-  mutate(attendance_grouping = case_when(attendances < 5000 ~ 'Less than 5,000',
-                                         attendances < 10000 ~ '5,000 to 9,999',
-                                         attendances < 15000 ~ '10,000 to 14,999',
-                                         attendances < 20000 ~ '15,000 to 19,999',
-                                         attendances < 25000 ~ '20,000 to 24,999',
-                                         TRUE ~ 'Over 25,0000'))
+data <- data |>
+  mutate(
+    attendance_grouping = case_when(
+      attendances < 5000 ~ 'Less than 5,000',
+      attendances < 10000 ~ '5,000 to 9,999',
+      attendances < 15000 ~ '10,000 to 14,999',
+      attendances < 20000 ~ '15,000 to 19,999',
+      attendances < 25000 ~ '20,000 to 24,999',
+      TRUE ~ 'Over 25,0000'
+    )
+  )
 
 # note the 'true' is the else statement and you use a tilde rather than equals
 # both work the same, the .default is the more modern method
@@ -567,13 +552,17 @@ data$attendances[1] <- NA
 # personally I find it best to use the true statement as an error catch 
 
 data <- data |>
-  mutate(attendance_grouping = case_when(attendances < 5000 ~ 'Less than 5,000',
-                                         attendances < 10000 ~ '5,000 to 9,999',
-                                         attendances < 15000 ~ '10,000 to 14,999',
-                                         attendances < 20000 ~ '15,000 to 19,999',
-                                         attendances < 25000 ~ '20,000 to 24,999',
-                                         attendances > 25000 ~ 'Over 25,0000',
-                                         .default = 'ERROR - does not compute'))
+  mutate(
+    attendance_grouping = case_when(
+      attendances < 5000 ~ 'Less than 5,000',
+      attendances < 10000 ~ '5,000 to 9,999',
+      attendances < 15000 ~ '10,000 to 14,999',
+      attendances < 20000 ~ '15,000 to 19,999',
+      attendances < 25000 ~ '20,000 to 24,999',
+      attendances > 25000 ~ 'Over 25,0000',
+      .default = 'ERROR - does not compute'
+    )
+  )
 
 # we can fix this by adding a >= and changing our grouping
 # description to '25,000 and over'
@@ -589,12 +578,7 @@ data <- data |>
 
 
 
-
-
-
-
-
-#######  HINT:  for your returns ensure they are all of the same data type
+#########################
 
 
 # base R if statement - allows us to do what I call a one-sided if statement
@@ -617,7 +601,7 @@ if (a == 5)  {
 # to do ALL of what is in the brackets
 # the 'scope' of the if statement is global
 
-a<- 5
+a <- 5
 
 if (a == 5)  {
   a <- 10
@@ -656,15 +640,9 @@ data_tot_perc <- data |>
 
 
 
+#########################
 
-
-
-
-
-
-####### hint - be very mindful of your commas and brackets!
-
-#  say we wanted to do that on all our numeric data
+# say we wanted to do that on all our numeric data
 # the awesome across function allows us to do pretty fancy stuff
 
 data_tot_perc <- data |>
@@ -689,12 +667,12 @@ data_tot_perc <- data |>
 # we are now going to do a rowwise operation to find the maximum of our 
 # attendances, admissions and our newly created column
 # in essence rowwise treats each each row as its own group
-data <-data |>
+data <- data |>
   rowwise() |>
   mutate(max_col = max(attendances,
                        admissions, 
                        breaches,
-                       na.rm=TRUE)) |>
+                       na.rm = TRUE)) |>
   ungroup()
 
 # note that rowwise is a grouping function and needs to be ungrouped
@@ -708,7 +686,8 @@ data <-data |>
 # often we want long data for charts and wide data for tables and often have to
 # convert from one to another
 
-# lets go wide, lets look at a handful of sites and attendances and pivot wider on date
+# lets go wide, lets look at a handful of sites and attendances and pivot wider 
+# on date
 
 # ie convert
 
@@ -748,18 +727,7 @@ data_wide <- data_wide |>
 
 
 
-
-
-
-
-
-
-# HINT: remember to run the first bit and pull through the right data before you pivot
-# for bonus points make the process one pipe
-
-
-###############
-
+#########################
 
 # lets do a complex version
 data_wide <- data |>
@@ -783,7 +751,7 @@ data_wide <- data |>
   filter(org_code %in% c('RQM',
                          'RJ1', 
                          'RF4'), 
-         #type == '1',                     # have not removed the type
+         # type == '1',                    # have not removed the type
          period >= '2018-08-01') |>
   select (org_code,
           period,
@@ -797,7 +765,8 @@ data_wide <- data_wide |>
   pivot_wider(names_from = period,
               values_from = attendances)
 
-# lets do a complex version with breaches as well - another period dependent variable
+# lets do a complex version with breaches as well - another period dependent 
+# variable
 data_wide <- data |>
   filter(org_code %in% c('RQM',
                          'RJ1', 
@@ -833,7 +802,8 @@ data_wide <- data_wide |>
                               breaches))
 
 # r has given us automatically generated column names
-# (there are options to change how that is handled, but not going to go into that now)
+# (there are options to change how that is handled, but not going to go into 
+# that now)
 
 # lets make our wide data long
 
@@ -886,14 +856,14 @@ data_roll <- data |>
   mutate(rolling = rollapply(attendances,
                              6,
                              mean,
-                             align= 'right',
+                             align = 'right',
                              fill = NA),
          .by = c(org_code,
                  type))
 
 # <<< Over to you >>>>
 
-# see if you can the window to 3 months
+# see if you can change the window to 3 months
 # then add an additional new column with a median over 3 months
 # with the median, see if you can calculate it on the middle time period
 # and replace any blanks with 9999
@@ -902,13 +872,7 @@ data_roll <- data |>
 
 
 
-
-
-
-
-
-# HINT: read your error messages
-
+#########################
 
 #####################
 # row numbers       #
@@ -916,7 +880,7 @@ data_roll <- data |>
 # date manipulation #
 ##################### 
 
-# adding a row number - useful calculating times between things
+# adding a row number - useful for calculating times between things
 # or identifying things like referral time to second contact etc
 
 data_row <- data |>
@@ -937,7 +901,7 @@ data_row <- data |>
           type,
           period) |>
   mutate(row_number = row_number(),
-         .by=c(org_code, type))
+         .by = c(org_code, type))
 
 # row number per date (dense rank)
 data_row <- data |>
@@ -948,7 +912,7 @@ data_row <- data |>
   mutate(row_number = dense_rank(period))
 
 # row number per date (dense rank) but in reverse order
-# normally would put a '-' in front of te variable to rank by and it would
+# normally would put a '-' in front of the variable to rank by and it would
 # rank its inverse which would work just fine
 # however you can't inverse a date. Therefore have reordered them and then 
 # converted the rank into an absolute value
@@ -974,7 +938,8 @@ data_row <- data |>
   filter(org_code %in% c('RQM',
                          'RJ1', 
                          'RDD'),
-         !between (period,  # note the ! in front for the between to convert it into a not between
+         !between (period,  # note the ! in front for the between to convert it 
+                   # into a not between
                    as.Date('2018-01-01') , 
                    as.Date('2018-12-31'))
   ) |>  
@@ -984,7 +949,7 @@ data_row <- data |>
   mutate(row_num = row_number(),
          .by = org_code, type)
 
-# the ! is awesome - for example could add if in front of the org code 
+# the ! is awesome - for example could add it in front of the org code 
 # to filter everything except for those org codes
 
 # <<< Over to you >>>>
@@ -996,12 +961,7 @@ data_row <- data |>
 
 
 
-
-
-
-
-
-
+#########################
 
 #####################
 # grouping by dates #
@@ -1011,7 +971,8 @@ data_row <- data |>
 data_year <- data |>
   filter(org_code == 'RQM',
          type == '1') |>
-  group_by(year_total = floor_date(period,       # note calling a new name to the grouped variable
+  group_by(year_total = floor_date(period,       # note calling a new name to 
+                                   # the grouped variable
                                    'year')) |>
   summarise (total_attendances = sum(attendances),
              total_breaches = sum(breaches),
@@ -1037,13 +998,7 @@ data_finance <- data |>
 
 
 
-
-
-
-
-
-
-
+#########################
 
 ######################
 # cutting up strings #
@@ -1061,10 +1016,11 @@ data_org_code_numbers <- data |>
                                         na = c("NA", 
                                                "Nothing")))
 
-# this does throw up a warning as a number of org_codes do not have numbers in them
-# it also is a little messy, but gives and idea of what can be done
+# this does throw up a warning as a number of org_codes do not have numbers in 
+# them it also is a little messy, but gives and idea of what can be done
 
-#maybe we want to filter our data to any org code that contains a 'R' or a 'P' anywhere
+# maybe we want to filter our data to any org code that contains a 'R' or a 'P' 
+# anywhere
 
 data_filt <- data |>
   filter (str_detect (org_code,'R') |      # note the use of | to denote 'or'
@@ -1073,20 +1029,14 @@ data_filt <- data |>
 # <<< Over to you >>>>
 
 # what organisations code have a number in them over 50?
-# can you return a dataframe with just the org_codes of those with a number over 50
+# can you return a dataframe with just the org_codes of those with a number over
+# 50
 
 
 
 
 
-
-
-
-
-
-
-
-################################
+#########################
 
 # sometimes we want to shorten strings 
 # we can do this by words or characters
@@ -1110,7 +1060,7 @@ word(example, start = 1, end = 4, sep = fixed(' ')) # note uses end and not stop
 
 long_hospital_name <- 'Boggins University HosPital NHS Trust'
 
-#lets change this to 'Boggins HosPital'
+# lets change this to 'Boggins HosPital'
 
 library(tm)
 # tm is a text mining library but has some nice text features
@@ -1124,7 +1074,7 @@ short_hospital_name
 
 # close but now we have odd spaces between our words and at the end
 
-# nice little function call  string squish
+# nice little function call string squish
 
 short_hospital_name <- str_squish(short_hospital_name)
 
@@ -1140,7 +1090,9 @@ short_hospital_name
 
 
 
-##########################################################
+
+
+#########################
 
 #####################
 # intro to  factors #
@@ -1152,14 +1104,19 @@ short_hospital_name
 
 data <- ae_attendances
 
-data <-data |>
-  mutate(attendance_grouping = case_when(attendances < 5000 ~ 'Less than 5,000',
-                                         attendances < 10000 ~ '5,000 to 9,999',
-                                         attendances < 15000 ~ '10,000 to 14,999',
-                                         attendances < 20000 ~ '15,000 to 19,999',
-                                         attendances < 25000 ~ '20,000 to 24,999',
-                                         attendances >= 25000 ~ '25,000 and over',
-                                         .default = 'ERROR - does not compute'))
+
+data <- data |>
+  mutate(
+    attendance_grouping = case_when(
+      attendances < 5000 ~ 'Less than 5,000',
+      attendances < 10000 ~ '5,000 to 9,999',
+      attendances < 15000 ~ '10,000 to 14,999',
+      attendances < 20000 ~ '15,000 to 19,999',
+      attendances < 25000 ~ '20,000 to 24,999',
+      attendances >= 25000 ~ '25,000 and over',
+      .default = 'ERROR - does not compute'
+    )
+  )
 
 # lets have a look at our attendance groupings
 data_fact <- data |>
@@ -1169,7 +1126,8 @@ data_fact <- data |>
 
 
 # lets do a super quick plot
-data_fact |> ggplot(aes(x=attendance_grouping)) +
+data_fact |> 
+  ggplot(aes(x = attendance_grouping)) +
   geom_bar()
 
 # lets change our character data type to a factor data type
@@ -1188,43 +1146,52 @@ data_fact <- data_fact |>
   )
 
 # lets do our plot again
-data_fact |> ggplot(aes(x=attendance_grouping)) +
+data_fact |> 
+  ggplot(aes(x = attendance_grouping)) +
   geom_bar()
 
 # also if we look at our dataframe again, we can sort it by that factor too
 
-#  this can be really useful to show groupings of providers by systems etc
-# we can also reorder factors based on a different variable, for instance you may
-# want to order your providers by number of attendances or highest performance
+# this can be really useful to show groupings of providers by systems etc
+# we can also reorder factors based on a different variable, for instance you 
+# may want to order your providers by number of attendances or highest 
+# performance
 
 # there are further funky things with factors, but will have to skim over.
-# just to say you can re order your factors for build your factors on other variables.
+# just to say you can re order your factors for build your factors on other 
+# variables.
 
 # WARNING - if you set your data as factors, R will not like you adding data 
 # into that column if is not one of the factors you have created.
-# There are ways of doing this but dont't have time now to go into detail
+# There are ways of doing this but don't have time now to go into detail
 # It is also possible to make factors more dynamically - again no time
 
 #########################
 # intro to dynamic text #
 #########################
 
-# A quick note on combining text and variables - useful for writing commentary or dynamic labels
+# A quick note on combining text and variables - useful for writing commentary 
+# or dynamic labels
 
-#  Say we want to create a sentence that says 'The maximum number of attendances was 20000' (or whatever it is)
+# Say we want to create a sentence that says 
+# 'The maximum number of attendances was 20000' (or whatever it is)
 
 # we can create join a string together with the paste0 command 
 
-text <- paste0('The maximum number of attendances was ', max(data$attendances))
+text <- paste0('The maximum number of attendances was ', 
+               max(data$attendances))
 
 # you can make longer strings and switch between text and non text with commas
 
-text <- paste0('The maximum number of attendances was ', max(data$attendances), ' and the lowest was ', min(data$attendances))
+text <- paste0('The maximum number of attendances was ', 
+               max(data$attendances), 
+               ' and the lowest was ', 
+               min(data$attendances))
 
 # the glue library has functions that are easier to use than paste
 library (glue)
 
-max_attend<- max(data$attendances)
+max_attend <- max(data$attendances)
 min_attend <- min(data$attendances)
 
 glue('The maximum number of attendances was {max_attend} and the lowest was {min_attend}')
@@ -1249,19 +1216,13 @@ data_spc |>
 # <<< Over to you >>>>
 
 #  add in a target of 17500
-#  we actually want to show improvement as a reduction 
+#  we actually want to show improvement as a reduction
 
 
 
 
 
-
-
-
-
-
-
-#################
+#########################
 
 # we now want to create a chart for each attendance type
 data_spc <- data |>
@@ -1302,26 +1263,14 @@ plot_spc |>
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-#####################################
+#########################
 
 ################################
 # Basic functional programming #
 ################################
 
-# say we want to do something many times,  we could just copy and past our code, 
-# but that gets really dull really quickly
+# say we want to do something many times,  we could just copy and paste our 
+# code, but that gets really dull really quickly
 # it also means if we update something, we have to update it in all the 
 # duplicate instances of that code
 # this gets super dull super quickly
@@ -1343,14 +1292,14 @@ x_mult <- x * 3
 
 
 # but we would have to repeat all of that again if we wanted to check y & z and
-# change all the varibles
+# change all the variables
 
 # so lets build a function
 # we start with naming our function
 # we then do all the calculations
 # we then return the result
-# NOTE - a function can only return one result, but later we will be clever in how 
-#        this 'one result' is built
+# NOTE - a function can only return one result, but later we will be clever in 
+#        how this 'one result' is built
 
 times_three <- function (input) {
   return (input * 3)
@@ -1364,10 +1313,8 @@ times_three(y)
 # or put in a new number completely
 times_three(7)
 
-# NOTE the variables mult and mod within our function only exist within the function
-# this is the scope of the function
-# a function can only return one object
-# you can add more than one varible into a function seperated by commas
+# NOTE a function can only return one object
+# you can add more than one variable into a function separated by commas
 
 x_times_y <- function (x, y) {
   result <- x * y
@@ -1375,7 +1322,7 @@ x_times_y <- function (x, y) {
   return (print(paste0('The answer is ', result, 'and b is ', b)))
 }
 
-var <- x_times_y (x,y)
+var <- x_times_y (x, y)
 
 # a function will only return one thing.  
 # You do not have to specify what it returns with a return function
@@ -1386,13 +1333,13 @@ x_times_y_no_return <- function (x, y) {
   print(paste0('The answer is ', result))
 }
 
-x_times_y_no_return (5,4)
+x_times_y_no_return (5, 4)
 
 # going back to our curly brackets and 'scope' for a function
-# what happens in a functions scope is not in the global environment
-# for instance the varible 'result' has not been created
+# what happens in a function's scope is not in the global environment
+# for instance the variable 'result' has not been created
 # it only exists within the scope
-# a function's scope can not affect outide of the function
+# a function's scope can not affect outside of the function
 
 test <- 'monkey'
 
@@ -1403,7 +1350,7 @@ x_times_y_scope <- function (x, y) {
 }
 
 # before we run this what will happen to the variable 'test'?
-x_times_y_scope (5,4)
+x_times_y_scope (5, 4)
 
 
 # you can also add multiple steps in a function
@@ -1416,7 +1363,7 @@ x_times_y_plus_ten_date <- function (x, y) {
 }
 
 # without running it please type into the chat the result of the function
-x_times_y_plus_ten_date (3,10)
+x_times_y_plus_ten_date (3, 10)
 
 # functions get pretty convoluted pretty quickly and can be hard to read
 # which is why it is good practice to write doc strings for functions 
@@ -1456,13 +1403,15 @@ x_times_y_plus_ten_date <- function (x, y) {
 # you should include a description and a variable description
 # future you or anyone else reading the code will be very thankful!
 
-# this function will fall over if you feed it the wring data type, more
-# advanced functions can handle error checking and testing, but thats for another day
+# this function will fall over if you feed it the wrong data type, more
+# advanced functions can handle error checking and testing, but that's for 
+# another day
 
 # <<< Over to you >>>>
 
 #  tweak the above function so that instead of times the first two inputs and 
-#  adds 10 to result on a day in the month you specify (another variable)
+#  add 10 to the result based on the day in the month it adds a number you 
+#  specify (another variable)
 
 # for bonus points assign your result to a variable
 
@@ -1470,12 +1419,7 @@ x_times_y_plus_ten_date <- function (x, y) {
 
 
 
-
-
-
-
-
-
+#########################
 
 # we can apply our made up new functions to a dataframe
 
@@ -1487,7 +1431,8 @@ data_fun <- data |>
 # perhaps the most ludicrous column name yet!
 data_fun <- data_fun |>
   rowwise() |>
-  mutate(attend_times_admit_maybe_plus_ten = x_times_y_plus_ten_date (attendances, admissions))
+  mutate(attend_times_admit_maybe_plus_ten = 
+           x_times_y_plus_ten_date (attendances, admissions, 10))
 
 
 # this is a bit of a silly example but shows what potentially can be done.
@@ -1506,15 +1451,7 @@ data_fun <- data_fun |>
 
 
 
-
-
-
-
-
-
-
-
-
+#########################
 
 # is not just data functions, we can set up a plot to be a function
 # say we had our lovely SPC chart set up the way we want it and we just want 
@@ -1524,7 +1461,8 @@ plot_site <- function (site) {
   
   # we now want to create a for each attendance type
   data_spc <- data |>
-    filter(org_code == site)      # note this is where we are using our 'site' variable
+    filter(org_code == site)      # note this is where we are using our 'site' 
+  # variable
   
   # turn our ptd_spc into an object
   plot_spc <- data_spc |>
@@ -1546,18 +1484,22 @@ plot_site('RJ1')
 
 plot_site('RDD')
 
-# it is good practice for a function not to call on anything outside of the function
-# in this instance we are calling on our 'data' which does not exist within the function
+# it is good practice for a function not to call on anything outside of the 
+# function
+# in this instance we are calling on our 'data' which does not exist within the 
+# function
 # this can cause issues, especially if we later change something in the data
 # so best practice is to feed the data into function.
-# We can set it to a default, but this allows us to change it later without issue
-# or to point it at another dataset if we want to without having to copy the function
+# We can set it to a default, but this allows us to change it later without 
+# issue
+# or to point it at another dataset if we want to without having to copy the 
+# function
 
 
-plot_site <- function (site='RJ1', df=data) {     # this is where we set a default
+plot_site <- function(site = 'RJ1', df = data) {# this is where we set a default
   
   # we now want to create a for each attendance type
-  data_spc <- df |>                        # note this is where pulling in our data
+  data_spc <- df |>                 # note this is where pulling in our data
     filter(org_code == site)      
   
   # turn our ptd_spc into an object
@@ -1578,16 +1520,16 @@ plot_site <- function (site='RJ1', df=data) {     # this is where we set a defau
 # works just the same 
 plot_site('RJ1')
 
-# ok so we have a nice facet plot for a single site, but now I want to create the
-# same plot but over a number of sites, or even all the sites
+# ok so we have a nice facet plot for a single site, but now I want to create 
+# the same plot but over a number of sites, or even all the sites
 # of course I could just call the function for each and every site, however
-# what if there is a new site or a site is removed.  I then have to keep a curated
-# site list.  Sounds like hard work.  Yerk!
+# what if there is a new site or a site is removed.  I then have to keep a 
+# curated site list.  Sounds like hard work.  Yerk!
 
 
 # the same function but with added doc string
 
-plot_site <- function (site, df=data) {
+plot_site <- function (site, df = data) {
   #
   # This function generates a PTD (Plot the dots)ggplot for a specific site 
   # based on attendance data. It utilizes pre-defined functions like 
@@ -1637,8 +1579,9 @@ plot_site <- function (site, df=data) {
 # simple for loops #
 ####################
 
-# a loop is a element of that repeats a portion of code a desired number of times
-# often with an iteration of values or varibles
+# a loop is a element of that repeats a portion of code a desired number of 
+# times
+# often with an iteration of values or variables
 
 # lets look at a simple sequence
 
@@ -1649,38 +1592,40 @@ seq(1:10)
 
 # we can make a loop to do this
 
-for (i in seq(1,10)) {                 # traditionally variables in a loop start at i (they just do!)
+for (i in seq(1, 10)) {          # traditionally variables in a loop start at i 
+  # (they just do!)
   # what will happen is R will run the loop and for the first iteration 
   # i will be 1 and then 2 and then 3 etc 
-  i_plus_five <- i+5
+  i_plus_five <- i + 5
   result <- paste0(i,' plus 5 equals ', i_plus_five)
   print(result)
 }
 
 # again with the curly brackets and scope
 # a for loop does have global scope, if you look i_plus_five
-# exists in the global enviornemt, only with its last value
+# exists in the global environment, only with its last value
 # it was over written each time time in the loop
 
 
 # we can mess about with seq to come up with all sorts of number patterns
 
-seq(50,nrow(data), 500)
+seq(50, nrow(data), 500)
 
 # this makes a number sequence that starts at 50, ends at the number of rows in 
-# our data (12765) and steps in incraments of 500
+# our data (12765) and steps in increments of 500
 
 # however the real magic starts is when we feed in a vector of data
 
 vector <- c('Bob', 'Pete', 'Mary')
 
 for (i in vector) {                 
-  result <- paste0('Hello ',i)
+  result <- paste0('Hello ', i)
   print(result)
 }
 
 # so now we can look at running our function but within a loop 
-# almost that simple but we need to recall that a function can only return one result
+# almost that simple but we need to recall that a function can only return one 
+# result
 # we would really like to collate all of those results into one object
 # we do this by utilising a list object
 # a list object is a super special multi dimensional thing that can contain
@@ -1730,12 +1675,3 @@ vector
 # pretty tables
 # pretty graphs
 # markdown/quarto
-
-
-
-
-
-
-
-
-
