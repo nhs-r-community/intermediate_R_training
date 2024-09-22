@@ -107,32 +107,36 @@ head(data,
      15)
 
 # see the first 15 rows of data - but using dpylr
-top_n(data, 
-      15)
+slice_head(data, 
+           n=15)
 
 # see the first 15% of total rows of data - but using dpylr
 # (defaults to last variable to order by)
-top_frac(data, 
-         .15)
+slice_head(data, 
+           prop= 0.15)
 
 # see the first 15% of total rows of data - but using dpylr
 # ordered by attendances
-top_frac(data, 
-         .15, 
-         attendances)
+slice_head(data, 
+           prop = 0.15, 
+           by = attendances)
 
 # <<< Over to you >>>>
 
-# see if you can find the lowest 5 attendances
+# see if you can find the lowest 5 attendances for each org code
 
 
+slice_min(data, 
+          n = 5, 
+          order_by = attendances,
+          by = org_code)
 
 
+slice_min(data, 
+          n = 5, 
+          order_by = attendances,
+          by = c(org_code, type))
 
-
-top_n(data,
-      -5,
-      attendances)
 
 #########################
 
@@ -390,14 +394,20 @@ df_new <- df_new |>
 
 df_one <- data |>
   select(admissions) |>
-  top_n(5, admissions)
+  slice_max(n= 5, 
+            order_by = admissions)
 
 df_two <- data |>
   select(attendances) |>
-  top_n(-5, attendances)
+  slice_min(n= 5, 
+           order_by = attendances)
 
 df_new <- bind_cols(df_one, 
                     df_two)
+
+
+
+
 
 #########################
 
@@ -510,9 +520,10 @@ data_filter <- data |>
 
 # <<< Over to you >>>>
 
-# can you write a script to check if we have one row per org_code
-# if we have not, return only those where we have more than one row?
-# and for bonus points put them in order by number of rows?
+# can you write a script that returns the org codes for type 1 attendances
+# where we have at least 24 submissions per org_code?
+# and for bonus points put them in order by number of submissions?
+# you may want to *count* your submissions
 
 
 
@@ -523,14 +534,11 @@ data_filter <- data |>
 # and maybe look at what else the function can do (?count)
 
 
-
-
-
-
 data_filter <- data |>
+  filter (type == '1') |>
   count(org_code,
         sort = TRUE) |>
-  filter (n > 1)
+  filter (n >= 24)
 
 #########################
 
@@ -1163,6 +1171,24 @@ data_year <- data |>
             .by = c(org_code,
                     finance_year))
 
+
+# with pretty finanical year dates
+data_year <- data |>
+  filter(org_code %in% c('RF4', 'RQ3'),
+         type == '1') |>
+  mutate(finance_year = ifelse(month(period) >= 4, 
+                               paste0(year(period), 
+                                      '/', 
+                                      str_sub((year(period)+1),3,4)), 
+                               paste0(year(period) -1, 
+                                      '/', 
+                                      str_sub(year(period),3,4)))) |>
+  summarise(max_attendances = max(attendances),
+            .by = c(org_code,
+                    finance_year))
+
+
+
 #########################
 
 ######################
@@ -1670,8 +1696,8 @@ data_fun <- data_fun |>
 
 my_three_mean_function <- function (x, y, z) {
   sums <- sum(x, y, z)
-  mean = sums / 3
-  print(mean)
+  mean_f = sums / 3
+  mean_f
 }
 
 my_three_mean_function(5, 7, 10)
@@ -1680,8 +1706,8 @@ my_three_mean_function(5, 7, 10)
 my_mean_any_function <- function (x) {
   sums <- sum(x)
   num <- length(x)
-  mean = sums / num
-  print(mean)
+  mean_f = sums / num
+  mean_f
 }
 
 my_mean_any_function (c(1, 2, 3, 4, 5))
@@ -1910,7 +1936,6 @@ vector
 # pretty tables
 # pretty graphs
 # markdown/quarto
-
 
 
 

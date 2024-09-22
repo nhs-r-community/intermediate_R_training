@@ -107,28 +107,32 @@ head(data,
      15)
 
 # see the first 15 rows of data - but using dpylr
-top_n(data, 
-      15)
+slice_head(data, 
+           n=15)
 
 # see the first 15% of total rows of data - but using dpylr
 # (defaults to last variable to order by)
-top_frac(data, 
-         .15)
+slice_head(data, 
+           prop= 0.15)
 
 # see the first 15% of total rows of data - but using dpylr
 # ordered by attendances
-top_frac(data, 
-         .15, 
-         attendances)
+slice_max(data, 
+           prop = 0.15, 
+           order_by = attendances)
 
 # <<< Over to you >>>>
 
-# see if you can find the lowest 5 attendances
+# see if you can find the lowest 5 attendances for each org code
+# do look for *help*
 
 
 
 
 
+
+# bonus points if you can 
+#find the lowest 5 attendances for each org code by each attendance type
 #########################
 
 # see summary statistics of a dataframe
@@ -282,6 +286,9 @@ data_select <- data |>
 
 #########################
 
+# note there are other tidy select verbs which we went over in the intro course
+# starts_with, ends_with 
+
 ####################################################
 # alternative joins - row and column concatenation #
 ####################################################
@@ -305,8 +312,8 @@ df_two <- data |>
 # jam the two data frames together, side by side
 # column bind
 
-df_new <- cbind(df_one,
-                df_two)
+df_new <- bind_cols(df_one,
+                    df_two)
 
 # note duplicated column is duplicated - which can cause issues - best to remove
 # or rename - also maintains order - need to be mindful you have rows that line 
@@ -320,8 +327,8 @@ df_one <- data |>
 df_two <- data |>
   tail()
 
-df_new <- rbind(df_one,
-                df_two)
+df_new <- bind_rows(df_one,
+                    df_two)
 
 # if we dont have matching columns can use bind_rows
 # which matches columns where they match and puts in na for where data does not 
@@ -370,8 +377,8 @@ df_two <- data |>
   select (org_code,
           admissions) 
 
-df_new_union <- union(df_one, 
-                      df_two)
+df_new_union <- union_all(df_one, 
+                          df_two)
 
 # Finding identical columns in both tables 
 df_new_intersect <- intersect(df_one, 
@@ -465,13 +472,18 @@ data_filter <- data |>
 
 # <<< Over to you >>>>
 
-# can you write a script to check if we have one row per org_code
-# if we have not, return only those where we have more than one row?
-# and for bonus points put them in order by number of rows?
+# can you write a script that returns the org codes for type 1 attendances
+# where we have at least 24 submissions per org_code?
+# and for bonus points put them in order by number of submissions?
 
 
 
 
+
+
+
+# HINT - you can *count* on the fact we have already covered how to do this
+# and maybe look at what else the function can do
 
 #########################
 
@@ -539,7 +551,7 @@ data <- data |>
 # however lets make a deliberate issue
 
 # for example this case statement fails if we have a value of exactly 25,000
-# well not fail, just puts something in the wrong category
+# well not fail, we just don't have a proper category for exactly 25,000
 data$attendances[1] <- 25000
 
 # now rerun the above case statement
@@ -567,12 +579,21 @@ data <- data |>
 # we can fix this by adding a >= and changing our grouping
 # description to '25,000 and over'
 
+# NOTE: As the the if_else, the case_when also requires all the possible results
+# to be of the same format and will check that is the case.
+# If dealing with numeric - often you need to include a 'magic error number'
+# This will be a result that stands out that could not possibly 
+# be part of the equation - for dates you can set 'magic error dates' etc
+
+
+
 # <<< Over to you >>>>
 
-# add a column that if type 1 halves the attendances
-#                   if type 2 triples the attendances
-#                   if type other quads the attendances
-#                   if error a suitable error
+# add a column called whatever you wish, that returns 
+#                   if type 1 ~ halves the attendances
+#                   if type 2 ~ triples the attendances
+#                   if type other ~ quads the attendances
+#                   if error ~ a suitable error
 
 
 
@@ -599,7 +620,7 @@ if (a == 5)  {
 
 # this is really powerful as works by if condition in brackets is met
 # to do ALL of what is in the brackets
-# the 'scope' of the if statement is global
+# the 'scope' of the if statement is global only when invoked
 
 a <- 5
 
@@ -634,13 +655,19 @@ data_tot_perc <- data |>
 
 # that creates a pretty long decimal as a percentage
 # can you round it to 1 decimal place?
-# may need a little google fu
+# may need a little google fu and commas and brackets will get messy fast
+
+
 
 
 
 
 
 #########################
+
+##########################
+# column wise operations #
+##########################
 
 # say we wanted to do that on all our numeric data
 # the awesome across function allows us to do pretty fancy stuff
@@ -675,7 +702,7 @@ data <- data |>
                        na.rm = TRUE)) |>
   ungroup()
 
-# note that rowwise is a grouping function and needs to be ungrouped
+# note that rowwise is an old skool grouping function and needs to be ungrouped
 
 ##########################
 # pivot wider and longer #
@@ -704,7 +731,7 @@ data <- data |>
 # lets start with filtering our data and selecting only a few columns
 
 
-data_wide <- data |>
+data_long <- data |>
   filter(org_code == 'RQM',
          type == '1',
          period >= '2018-08-01') |>
@@ -715,7 +742,7 @@ data_wide <- data |>
 # have quick look at your data and see what shape it is in
 
 # lets pivot
-data_wide <- data_wide |>
+data_wide <- data_long |>
   pivot_wider(names_from = period,
               values_from = attendances)
 
@@ -730,7 +757,7 @@ data_wide <- data_wide |>
 #########################
 
 # lets do a complex version
-data_wide <- data |>
+data_long <- data |>
   filter(org_code == 'RF4',
          #type == '1',                     # have not removed the type this time
          period >= '2018-08-01') |>
@@ -742,12 +769,12 @@ data_wide <- data |>
 # look at the data
 
 # lets pivot
-data_wide <- data_wide |>
+data_wide <- data_long |>
   pivot_wider(names_from = period,
               values_from = attendances)
 
 # lets do a complex version with more sites
-data_wide <- data |>
+data_long <- data |>
   filter(org_code %in% c('RQM',
                          'RJ1', 
                          'RF4'), 
@@ -761,13 +788,13 @@ data_wide <- data |>
 # look at the data
 
 # lets pivot
-data_wide <- data_wide |>
+data_wide <- data_long |>
   pivot_wider(names_from = period,
               values_from = attendances)
 
 # lets do a complex version with breaches as well - another period dependent 
 # variable
-data_wide <- data |>
+data_long <- data |>
   filter(org_code %in% c('RQM',
                          'RJ1', 
                          'RF4'), 
@@ -781,12 +808,12 @@ data_wide <- data |>
 # look at the data
 
 # lets pivot 
-data_wide <- data_wide |>
+data_wide <- data_long |>
   pivot_wider(names_from = period,
               values_from = attendances)
 
 # yuck not what we want - reset the data and lets try again
-data_wide <- data |>
+data_long <- data |>
   filter(org_code %in% c('RQM','RJ1', 'RF4'), 
          period >= '2018-08-01') |>
   select (org_code,
@@ -796,7 +823,7 @@ data_wide <- data |>
           type)                           
 
 # lets pivot 
-data_wide <- data_wide |>
+data_wide <- data_long |>
   pivot_wider(names_from = period,
               values_from = c(attendances, 
                               breaches))
@@ -866,7 +893,11 @@ data_roll <- data |>
 # see if you can change the window to 3 months
 # then add an additional new column with a median over 3 months
 # with the median, see if you can calculate it on the middle time period
+# so that it is the median of the month behind and month ahead
 # and replace any blanks with 9999
+
+
+
 
 
 
@@ -992,7 +1023,9 @@ data_finance <- data |>
 # create a dataframe that contains a summary of sites RF4 and RQ3
 # and returns the maximum number of type 1 attendances 
 # across those sites by financial year
-# (yes that is a ridiculous question)
+
+
+
 
 
 
@@ -1197,6 +1230,7 @@ min_attend <- min(data$attendances)
 glue('The maximum number of attendances was {max_attend} and the lowest was {min_attend}')
 # this does the same with with considerably fewer brackets and commas
 
+# check out my git hub for a whole mini tutorial on dynamic text
 
 ############################################
 # SPC - statistical process control graphs #
@@ -1319,7 +1353,7 @@ times_three(7)
 x_times_y <- function (x, y) {
   result <- x * y
   b <- 150
-  return (print(paste0('The answer is ', result, 'and b is ', b)))
+  return (print(paste0('The answer is ', result, ' and b is ', b)))
 }
 
 var <- x_times_y (x, y)
@@ -1413,7 +1447,7 @@ x_times_y_plus_ten_date <- function (x, y) {
 #  add 10 to the result based on the day in the month it adds a number you 
 #  specify (another variable)
 
-# for bonus points assign your result to a variable
+
 
 
 
@@ -1446,8 +1480,9 @@ data_fun <- data_fun |>
 # without using the 'mean' function
 # for extra credit
 # create a function that calculates the mean over any set of numbers
-
-
+# HINT: How would you have a multiple length input, 
+#                                 obviously not a single variable...
+# How you you then determine what its *length* is?
 
 
 
